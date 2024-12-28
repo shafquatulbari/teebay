@@ -1,14 +1,16 @@
 import React from "react";
-import { ApolloProvider } from "@apollo/client";
-import client from "./apolloClient";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
   return (
-    <ApolloProvider client={client}>
-      <div className="App">
-        <h1>Welcome to the Marketplace App</h1>
-      </div>
-    </ApolloProvider>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </Router>
   );
 }
 
