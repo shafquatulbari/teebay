@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/add-product" element={<MultiPageForm />} />
+        <Route path="/add" element={<MultiPageForm />} />
         <Route path="/products" element={<ProductList />} />
       </Routes>
     </Router>

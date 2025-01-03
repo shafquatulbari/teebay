@@ -19,7 +19,9 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await loginUser({ variables: { ...formData } });
-      alert(`Login successful! Token: ${response.data.loginUser}`);
+      const token = response.data.loginUser;
+      localStorage.setItem("token", token); // Store the token
+      alert("Login successful!");
     } catch (err) {
       alert(err.message);
     }

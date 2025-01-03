@@ -57,4 +57,5 @@ extend type Query {
   getProducts: [Product]
   getProductById(id: Int!): Product
   getUserTransactions: [Transaction]
+  getCategories: [Category!]!
 }

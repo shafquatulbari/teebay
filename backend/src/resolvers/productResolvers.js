@@ -19,6 +19,9 @@ const productResolvers = {
         include: { product: true },
       });
     },
+    getCategories: async () => {
+      return await prisma.category.findMany();
+    },
   },
 
   Mutation: {
@@ -50,6 +53,7 @@ const productResolvers = {
         },
         include: {
           owner: true, // Ensure the owner is included in the response
+          category: true, // Ensure the category is included in the response
         },
       });
     },

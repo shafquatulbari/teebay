@@ -24,13 +24,24 @@ const DELETE_PRODUCT = gql`
 
 const ProductList = () => {
   const { loading, error, data } = useQuery(GET_PRODUCTS);
-  const [deleteProduct] = useMutation(DELETE_PRODUCT, {
-    refetchQueries: [{ query: GET_PRODUCTS }], // Refetch products after delete
-  });
+  const [deleteProduct] = useMutation(DELETE_PRODUCT);
 
   const handleDelete = async (id) => {
     try {
-      await deleteProduct({ variables: { id } });
+      await deleteProduct({
+        variables: { id },
+        update(cache) {
+          cache.modify({
+            fields: {
+              getProducts(existingProducts = [], { readField }) {
+                return existingProducts.filter(
+                  (product) => readField("id", product) !== id
+                );
+              },
+            },
+          });
+        },
+      });
       alert("Product deleted successfully!");
     } catch (err) {
       alert(`Failed to delete product: ${err.message}`);

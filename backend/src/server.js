@@ -42,12 +42,13 @@ app.use(
     credentials: true,
   })
 );
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => {
     const token = req.headers.authorization || "";
-    const userId = parseToken(token); // Only return userId
+    const userId = parseToken(token);
     // if (!userId) {
     //   throw new Error("Unauthorized: Invalid or missing token");
     // }
