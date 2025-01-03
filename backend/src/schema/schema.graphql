@@ -9,8 +9,53 @@ type Query {
   hello: String
 }
 
+type Product {
+  id: Int!
+  name: String!
+  description: String!
+  price: Float!
+  category: Category!
+  owner: User!
+  status: String!
+  createdAt: String!
+}
+
+type Category {
+  id: Int!
+  name: String!
+  products: [Product]!
+}
+
+type Transaction {
+  id: Int!
+  product: Product!
+  user: User!
+  type: String!
+  createdAt: String!
+}
+
 type Mutation {
   registerUser(email: String!, password: String!, name: String!): User
   loginUser(email: String!, password: String!): String
+  addProduct(
+    name: String!
+    description: String!
+    price: Float!
+    categoryId: Int!
+  ): Product
+  editProduct(
+    id: Int!
+    name: String
+    description: String
+    price: Float
+    status: String
+  ): Product
+  deleteProduct(id: Int!): String
 }
 
+extend type Query {
+  getProducts: [Product]
+  getProductById(id: Int!): Product
+  getUserTransactions: [Transaction]
+  getCategories: [Category!]!
+}
