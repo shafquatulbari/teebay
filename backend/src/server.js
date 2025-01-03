@@ -7,6 +7,7 @@ const prisma = require("./prisma");
 const userResolvers = require("./resolvers/userResolvers");
 const productResolvers = require("./resolvers/productResolvers");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
 
 const SECRET_KEY = "supersecretkey"; // Replace this with your secure key
 
@@ -34,15 +35,22 @@ const parseToken = (token) => {
 };
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => {
     const token = req.headers.authorization || "";
     const userId = parseToken(token); // Only return userId
-    if (!userId) {
-      throw new Error("Unauthorized: Invalid or missing token");
-    }
+    // if (!userId) {
+    //   throw new Error("Unauthorized: Invalid or missing token");
+    // }
     return { userId };
   },
 });
