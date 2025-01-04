@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
 
 const LOGIN_USER = gql`
   mutation LoginUser($email: String!, $password: String!) {
@@ -7,9 +8,10 @@ const LOGIN_USER = gql`
   }
 `;
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loginUser, { data, loading, error }] = useMutation(LOGIN_USER);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,7 +23,9 @@ const Login = () => {
       const response = await loginUser({ variables: { ...formData } });
       const token = response.data.loginUser;
       localStorage.setItem("token", token); // Store the token
+      onLogin(); // Update isAuthenticated in the App component
       alert("Login successful!");
+      navigate("/products"); // Redirect to products page
     } catch (err) {
       alert(err.message);
     }

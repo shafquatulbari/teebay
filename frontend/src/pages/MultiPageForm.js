@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import { useQuery } from "@apollo/client";
+import { useLocation } from "react-router-dom";
 
 export const GET_CATEGORIES = gql`
   query GetCategories {
@@ -68,6 +69,7 @@ export const EDIT_PRODUCT = gql`
 
 const MultiPageForm = ({ isEditing, productId, preloadedData }) => {
   const [step, setStep] = useState(1);
+  const { state } = useLocation();
   const { control, handleSubmit } = useForm({
     defaultValues: preloadedData || {
       name: "",

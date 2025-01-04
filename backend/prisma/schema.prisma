@@ -22,6 +22,7 @@ model Product {
   name        String
   description String
   price       Float
+  rentalRate  Float?    
   category    Category  @relation(fields: [categoryId], references: [id])
   categoryId  Int
   owner       User      @relation(fields: [ownerId], references: [id])
@@ -30,6 +31,7 @@ model Product {
   createdAt   DateTime  @default(now())
   transactions Transaction[]
 }
+
 
 
 model Category {

@@ -22,12 +22,22 @@ const productResolvers = {
     getCategories: async () => {
       return await prisma.category.findMany();
     },
+    getUserTransactions: async (_, __, { userId }) => {
+      if (!userId) {
+        throw new Error("Unauthorized: Please log in to view transactions.");
+      }
+
+      return await prisma.transaction.findMany({
+        where: { userId },
+        include: { product: true },
+      });
+    },
   },
 
   Mutation: {
     addProduct: async (
       _,
-      { name, description, price, categoryId },
+      { name, description, price, rentalRate, categoryId },
       { userId }
     ) => {
       if (!userId) {
@@ -48,6 +58,7 @@ const productResolvers = {
           name,
           description,
           price,
+          rentalRate,
           categoryId,
           ownerId: userId,
         },
@@ -60,7 +71,7 @@ const productResolvers = {
 
     editProduct: async (
       _,
-      { id, name, description, price, status },
+      { id, name, description, price, rentalRate, status },
       { userId }
     ) => {
       if (!userId) {
@@ -83,7 +94,7 @@ const productResolvers = {
       // Update the product and include the owner relationship
       return await prisma.product.update({
         where: { id },
-        data: { name, description, price, status },
+        data: { name, description, price, rentalRate, status },
         include: { owner: true }, // Ensure the owner is included in the response
       });
     },
@@ -95,6 +106,69 @@ const productResolvers = {
       }
       await prisma.product.delete({ where: { id } });
       return "Product deleted successfully";
+    },
+    rentProduct: async (_, { productId }, { userId }) => {
+      if (!userId) {
+        throw new Error("Unauthorized: Please log in to rent a product.");
+      }
+
+      const product = await prisma.product.findUnique({
+        where: { id: productId },
+      });
+      if (!product) {
+        throw new Error(`Product with ID ${productId} does not exist.`);
+      }
+
+      if (product.status !== "AVAILABLE") {
+        throw new Error("Product is not available for rent.");
+      }
+
+      const transaction = await prisma.transaction.create({
+        data: {
+          productId,
+          userId,
+          type: "RENT",
+        },
+      });
+
+      await prisma.product.update({
+        where: { id: productId },
+        data: { status: "RENTED" },
+      });
+
+      return transaction;
+    },
+
+    buyProduct: async (_, { productId }, { userId }) => {
+      if (!userId) {
+        throw new Error("Unauthorized: Please log in to buy a product.");
+      }
+
+      const product = await prisma.product.findUnique({
+        where: { id: productId },
+      });
+      if (!product) {
+        throw new Error(`Product with ID ${productId} does not exist.`);
+      }
+
+      if (product.status !== "AVAILABLE") {
+        throw new Error("Product is not available for purchase.");
+      }
+
+      const transaction = await prisma.transaction.create({
+        data: {
+          productId,
+          userId,
+          type: "BUY",
+        },
+      });
+
+      await prisma.product.update({
+        where: { id: productId },
+        data: { status: "SOLD" },
+      });
+
+      return transaction;
     },
   },
 };

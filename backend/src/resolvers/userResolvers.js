@@ -5,6 +5,14 @@ const jwt = require("jsonwebtoken");
 const SECRET_KEY = "supersecretkey"; // Replace with a secure key in production
 
 const userResolvers = {
+  Query: {
+    getUserId: (_, __, { userId }) => {
+      if (!userId) {
+        throw new Error("Unauthorized: Please log in.");
+      }
+      return userId; // Return the user ID from the context
+    },
+  },
   Mutation: {
     registerUser: async (_, { email, password, name }) => {
       // Check if user already exists
