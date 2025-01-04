@@ -22,12 +22,6 @@ export const GET_PRODUCTS = gql`
   }
 `;
 
-const GET_USER_ID = gql`
-  query GetUserId {
-    getUserId
-  }
-`;
-
 const DELETE_PRODUCT = gql`
   mutation DeleteProduct($id: Int!) {
     deleteProduct(id: $id)
@@ -63,13 +57,12 @@ const BUY_PRODUCT = gql`
 const ProductList = () => {
   const navigate = useNavigate();
   const { loading, error, data } = useQuery(GET_PRODUCTS);
-  const { data: userData, loading: userLoading } = useQuery(GET_USER_ID); // Fetch user ID
   const [deleteProduct] = useMutation(DELETE_PRODUCT);
   const [rentProduct] = useMutation(RENT_PRODUCT);
   const [buyProduct] = useMutation(BUY_PRODUCT);
 
-  const currentUserId = userData?.getUserId;
-  console.log("currentUserId", currentUserId);
+  const currentUserId = Number(localStorage.getItem("userId"));
+  console.log("Logged-in user ID:", currentUserId);
 
   const handleDelete = async (id) => {
     try {
@@ -111,8 +104,8 @@ const ProductList = () => {
     }
   };
 
-  if (loading || userLoading) return <p>Loading...</p>; // Wait for both queries to load
   if (error) return <p>Error: {error.message}</p>;
+  if (loading) return <p>Loading products...</p>;
 
   return (
     <div>
@@ -123,7 +116,7 @@ const ProductList = () => {
             <th>Name</th>
             <th>Description</th>
             <th>Price</th>
-            <th>Rental Rate</th> {/* Add Rental Rate */}
+            <th>Rental Rate</th>
             <th>Category</th>
             <th>Status</th>
             <th>Actions</th>
@@ -136,7 +129,7 @@ const ProductList = () => {
               <td>{product.description}</td>
               <td>${product.price.toFixed(2)}</td>
               <td>${product.rentalRate?.toFixed(2)}</td>
-              <td>{product.category.name}</td>
+              <td>{product.category?.name || "N/A"}</td>
               <td>{product.status}</td>
               <td>
                 {product.owner?.id === currentUserId ? (
@@ -148,7 +141,6 @@ const ProductList = () => {
                     >
                       Edit
                     </button>
-
                     <button onClick={() => handleDelete(product.id)}>
                       Delete
                     </button>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const LOGIN_USER = gql`
   mutation LoginUser($email: String!, $password: String!) {
@@ -21,8 +22,10 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     try {
       const response = await loginUser({ variables: { ...formData } });
-      const token = response.data.loginUser;
-      localStorage.setItem("token", token); // Store the token
+      const token = response.data.loginUser; // Assuming this is the JWT token
+      const decoded = jwtDecode(token); // Decode the JWT to extract userId
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", decoded.userId); // Store userId
       onLogin(); // Update isAuthenticated in the App component
       alert("Login successful!");
       navigate("/products"); // Redirect to products page
