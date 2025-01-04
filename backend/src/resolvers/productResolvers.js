@@ -25,11 +25,24 @@ const productResolvers = {
       });
     },
     getUserTransactions: async (_, __, { userId }) => {
-      return await prisma.transaction.findMany({
-        where: { userId },
-        include: { product: true },
+      if (!userId) {
+        throw new Error("Unauthorized: Please log in.");
+      }
+
+      const transactions = await prisma.transaction.findMany({
+        where: {
+          OR: [{ userId }, { product: { ownerId: userId } }],
+        },
+        include: {
+          product: { include: { owner: true } },
+          user: true,
+        },
       });
+
+      console.log("Fetched Transactions:", transactions); // Log fetched data
+      return transactions;
     },
+
     getCategories: async () => {
       return await prisma.category.findMany();
     },
@@ -157,7 +170,9 @@ const productResolvers = {
 
       const product = await prisma.product.findUnique({
         where: { id: productId },
+        include: { owner: true }, // Include owner details
       });
+
       if (!product) {
         throw new Error(`Product with ID ${productId} does not exist.`);
       }
@@ -166,34 +181,35 @@ const productResolvers = {
         throw new Error("Product is not available for rent.");
       }
 
-      // Create two transactions (BORROW and LEND)
-      const transactions = await prisma.transaction.createMany({
-        data: [
-          {
-            productId,
-            userId,
-            type: "BORROW", // Borrow transaction
-          },
-          {
-            productId,
-            userId: product.ownerId,
-            type: "LEND", // Lend transaction
-          },
-        ],
+      // Create the "BORROW" transaction
+      const borrowTransaction = await prisma.transaction.create({
+        data: {
+          productId,
+          userId, // The user renting the product
+          type: "BORROW",
+        },
+        include: {
+          product: { include: { owner: true } }, // Include product details
+        },
       });
 
-      // Update product status
+      // Create the "LEND" transaction for the owner
+      await prisma.transaction.create({
+        data: {
+          productId,
+          userId: product.ownerId, // The product owner
+          type: "LEND",
+        },
+      });
+
+      // Update the product's status to "RENTED"
       await prisma.product.update({
         where: { id: productId },
         data: { status: "RENTED" },
       });
 
-      // Fetch the created transactions with their IDs
-      const createdTransactions = await prisma.transaction.findMany({
-        where: { productId },
-      });
-
-      return createdTransactions;
+      // Return the "BORROW" transaction
+      return borrowTransaction;
     },
 
     buyProduct: async (_, { productId }, { userId }) => {
@@ -203,7 +219,9 @@ const productResolvers = {
 
       const product = await prisma.product.findUnique({
         where: { id: productId },
+        include: { owner: true }, // Include owner details
       });
+
       if (!product) {
         throw new Error(`Product with ID ${productId} does not exist.`);
       }
@@ -212,31 +230,34 @@ const productResolvers = {
         throw new Error("Product is not available for purchase.");
       }
 
-      // Create two transactions (BUY and SELL)
+      // Create two transactions: BUY for buyer and SELL for seller
       const transactions = await prisma.transaction.createMany({
         data: [
           {
             productId,
-            userId,
-            type: "BUY", // Buy transaction
+            userId, // The user who is buying
+            type: "BUY",
           },
           {
             productId,
-            userId: product.ownerId,
-            type: "SELL", // Sell transaction
+            userId: product.ownerId, // The product owner
+            type: "SELL",
           },
         ],
       });
 
-      // Update product status
+      // Update the product's status
       await prisma.product.update({
         where: { id: productId },
         data: { status: "SOLD" },
       });
 
-      // Fetch the created transactions with their IDs
+      // Fetch and return created transactions
       const createdTransactions = await prisma.transaction.findMany({
         where: { productId },
+        include: {
+          product: { include: { owner: true } },
+        },
       });
 
       return createdTransactions;

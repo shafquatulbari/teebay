@@ -27,6 +27,7 @@ const AppRoutes = ({ isAuthenticated, setIsAuthenticated }) => {
     <div>
       {isAuthenticated && (
         <nav>
+          <h1> Logged in user: {localStorage.getItem("userId")}</h1>
           <button onClick={() => navigate("/products")}>Products</button>
           <button onClick={() => navigate("/transactions")}>
             Transactions

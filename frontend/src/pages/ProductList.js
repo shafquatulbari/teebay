@@ -33,6 +33,7 @@ const RENT_PRODUCT = gql`
     rentProduct(productId: $productId) {
       id
       product {
+        id
         name
       }
       type
@@ -88,8 +89,8 @@ const ProductList = () => {
 
   const handleRent = async (id) => {
     try {
-      await rentProduct({ variables: { productId: id } });
-      alert("Product rented successfully!");
+      const response = await rentProduct({ variables: { productId: id } });
+      console.log("Rent Transaction:", response.data.rentProduct);
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
