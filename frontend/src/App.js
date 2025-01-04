@@ -49,7 +49,10 @@ const AppRoutes = ({ isAuthenticated, setIsAuthenticated }) => {
           <>
             <Route path="/products" element={<ProductList />} />
             <Route path="/add" element={<MultiPageForm />} />
-            <Route path="/edit/:id" element={<MultiPageForm isEditing />} />
+            <Route
+              path="/edit/:id"
+              element={<MultiPageForm isEditing={true} />}
+            />
             <Route path="/transactions" element={<TransactionDashboard />} />
             <Route path="*" element={<Navigate to="/products" />} />
           </>

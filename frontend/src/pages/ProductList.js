@@ -2,7 +2,7 @@ import React from "react";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 
-const GET_PRODUCTS = gql`
+export const GET_PRODUCTS = gql`
   query GetProducts {
     getProducts {
       id
@@ -11,6 +11,7 @@ const GET_PRODUCTS = gql`
       price
       rentalRate
       category {
+        id
         name
       }
       status
@@ -67,10 +68,8 @@ const ProductList = () => {
   const [rentProduct] = useMutation(RENT_PRODUCT);
   const [buyProduct] = useMutation(BUY_PRODUCT);
 
-  const currentUserId = userData?.getUserId; // Current logged-in user ID
-  const handleEdit = (product) => {
-    navigate(`/edit/${product.id}`, { state: { product } });
-  };
+  const currentUserId = userData?.getUserId;
+  console.log("currentUserId", currentUserId);
 
   const handleDelete = async (id) => {
     try {
@@ -137,15 +136,19 @@ const ProductList = () => {
               <td>{product.description}</td>
               <td>${product.price.toFixed(2)}</td>
               <td>${product.rentalRate?.toFixed(2)}</td>
-              {/* Rental Rate */}
               <td>{product.category.name}</td>
               <td>{product.status}</td>
               <td>
                 {product.owner?.id === currentUserId ? (
                   <>
-                    <button onClick={() => navigate(`/edit/${product.id}`)}>
+                    <button
+                      onClick={() =>
+                        navigate(`/edit/${product.id}`, { state: { product } })
+                      }
+                    >
                       Edit
                     </button>
+
                     <button onClick={() => handleDelete(product.id)}>
                       Delete
                     </button>

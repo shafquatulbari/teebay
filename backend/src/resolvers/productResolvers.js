@@ -2,11 +2,22 @@ const prisma = require("../prisma");
 
 const productResolvers = {
   Query: {
-    getProducts: async () => {
-      return await prisma.product.findMany({
+    getProducts: async (_, __, { userId }) => {
+      if (!userId) {
+        throw new Error("Unauthorized: Please log in.");
+      }
+
+      const products = await prisma.product.findMany({
         include: { category: true, owner: true },
       });
+
+      // Handle products with missing categories
+      return products.map((product) => ({
+        ...product,
+        category: product.category || null,
+      }));
     },
+
     getProductById: async (_, { id }) => {
       return await prisma.product.findUnique({
         where: { id },
@@ -58,7 +69,7 @@ const productResolvers = {
           name,
           description,
           price,
-          rentalRate,
+          rentalRate: rentalRate || null, // Set rental rate to 0 if not provided
           categoryId,
           ownerId: userId,
         },
@@ -69,34 +80,37 @@ const productResolvers = {
       });
     },
 
-    editProduct: async (
-      _,
-      { id, name, description, price, rentalRate, status },
-      { userId }
-    ) => {
+    editProduct: async (_, args, { userId }) => {
+      console.log("Received Args:", args); // Log input arguments
+      console.log("Context U ID:", userId); // Log the user ID from context
+
       if (!userId) {
         throw new Error("Unauthorized: Please log in to edit a product.");
       }
 
-      // Find the product by ID
-      const product = await prisma.product.findUnique({ where: { id } });
-
-      // If the product does not exist, throw an error
-      if (!product) {
-        throw new Error(`Product with ID ${id} does not exist.`);
-      }
-
-      // Ensure the user is the owner of the product
-      if (product.ownerId !== userId) {
-        throw new Error("Unauthorized: You can only edit your own products.");
-      }
-
-      // Update the product and include the owner relationship
-      return await prisma.product.update({
-        where: { id },
-        data: { name, description, price, rentalRate, status },
-        include: { owner: true }, // Ensure the owner is included in the response
+      const product = await prisma.product.findUnique({
+        where: { id: args.id },
       });
+      console.log("Found Product:", product);
+
+      if (!product) {
+        throw new Error(`Product with ID ${args.id} does not exist.`);
+      }
+
+      const updatedProduct = await prisma.product.update({
+        where: { id: args.id },
+        data: {
+          name: args.name,
+          description: args.description,
+          price: args.price,
+          rentalRate: args.rentalRate,
+          status: args.status,
+        },
+        include: { owner: true },
+      });
+
+      console.log("Updated Product:", updatedProduct);
+      return updatedProduct;
     },
 
     deleteProduct: async (_, { id }, { userId }) => {
