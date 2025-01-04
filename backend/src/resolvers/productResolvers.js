@@ -33,14 +33,27 @@ const productResolvers = {
     getCategories: async () => {
       return await prisma.category.findMany();
     },
+
     getUserTransactions: async (_, __, { userId }) => {
       if (!userId) {
-        throw new Error("Unauthorized: Please log in to view transactions.");
+        throw new Error("Unauthorized: Please log in.");
       }
 
+      // Fetch transactions for the logged-in user
       return await prisma.transaction.findMany({
-        where: { userId },
-        include: { product: true },
+        where: {
+          OR: [
+            { userId }, // Transactions where the user is the buyer or borrower
+            { product: { ownerId: userId } }, // Transactions where the user's product is sold or lent
+          ],
+        },
+        include: {
+          product: {
+            include: {
+              owner: true, // Include the owner details of the product
+            },
+          },
+        },
       });
     },
   },
@@ -115,12 +128,28 @@ const productResolvers = {
 
     deleteProduct: async (_, { id }, { userId }) => {
       const product = await prisma.product.findUnique({ where: { id } });
+
       if (product.ownerId !== userId) {
         throw new Error("Unauthorized to delete this product");
       }
-      await prisma.product.delete({ where: { id } });
+
+      // Delete associated transactions first
+      await prisma.transaction.deleteMany({
+        where: {
+          productId: id,
+        },
+      });
+
+      // Now delete the product
+      await prisma.product.delete({
+        where: {
+          id,
+        },
+      });
+
       return "Product deleted successfully";
     },
+
     rentProduct: async (_, { productId }, { userId }) => {
       if (!userId) {
         throw new Error("Unauthorized: Please log in to rent a product.");
@@ -137,20 +166,34 @@ const productResolvers = {
         throw new Error("Product is not available for rent.");
       }
 
-      const transaction = await prisma.transaction.create({
-        data: {
-          productId,
-          userId,
-          type: "RENT",
-        },
+      // Create two transactions (BORROW and LEND)
+      const transactions = await prisma.transaction.createMany({
+        data: [
+          {
+            productId,
+            userId,
+            type: "BORROW", // Borrow transaction
+          },
+          {
+            productId,
+            userId: product.ownerId,
+            type: "LEND", // Lend transaction
+          },
+        ],
       });
 
+      // Update product status
       await prisma.product.update({
         where: { id: productId },
         data: { status: "RENTED" },
       });
 
-      return transaction;
+      // Fetch the created transactions with their IDs
+      const createdTransactions = await prisma.transaction.findMany({
+        where: { productId },
+      });
+
+      return createdTransactions;
     },
 
     buyProduct: async (_, { productId }, { userId }) => {
@@ -169,20 +212,34 @@ const productResolvers = {
         throw new Error("Product is not available for purchase.");
       }
 
-      const transaction = await prisma.transaction.create({
-        data: {
-          productId,
-          userId,
-          type: "BUY",
-        },
+      // Create two transactions (BUY and SELL)
+      const transactions = await prisma.transaction.createMany({
+        data: [
+          {
+            productId,
+            userId,
+            type: "BUY", // Buy transaction
+          },
+          {
+            productId,
+            userId: product.ownerId,
+            type: "SELL", // Sell transaction
+          },
+        ],
       });
 
+      // Update product status
       await prisma.product.update({
         where: { id: productId },
         data: { status: "SOLD" },
       });
 
-      return transaction;
+      // Fetch the created transactions with their IDs
+      const createdTransactions = await prisma.transaction.findMany({
+        where: { productId },
+      });
+
+      return createdTransactions;
     },
   },
 };

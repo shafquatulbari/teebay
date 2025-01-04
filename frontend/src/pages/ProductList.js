@@ -97,7 +97,8 @@ const ProductList = () => {
 
   const handleBuy = async (id) => {
     try {
-      await buyProduct({ variables: { productId: id } });
+      const response = await buyProduct({ variables: { productId: id } });
+      console.log("Buy Transactions:", response.data.buyProduct);
       alert("Product bought successfully!");
     } catch (err) {
       alert(`Error: ${err.message}`);
