@@ -28,6 +28,9 @@ const AppRoutes = ({ isAuthenticated, setIsAuthenticated }) => {
 
   return (
     <div>
+      <header className="p-4 bg-gray-900 text-white text-center text-2xl font-bold">
+        Teebay
+      </header>
       {isAuthenticated && (
         <nav className="p-4 bg-gray-800 text-white flex justify-between items-center">
           <h1 className="text-lg font-bold">
