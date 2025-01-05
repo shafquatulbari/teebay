@@ -19,21 +19,49 @@ const AppRoutes = ({ isAuthenticated, setIsAuthenticated }) => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    localStorage.removeItem("username");
     setIsAuthenticated(false);
     navigate("/login");
   };
 
+  const username = localStorage.getItem("username");
+
   return (
     <div>
+      <header className="p-4 bg-gray-900 text-white text-center text-2xl font-bold">
+        Teebay
+      </header>
       {isAuthenticated && (
-        <nav>
-          <h1> Logged in user: {localStorage.getItem("userId")}</h1>
-          <button onClick={() => navigate("/products")}>Products</button>
-          <button onClick={() => navigate("/transactions")}>
-            Transactions
-          </button>
-          <button onClick={handleLogout}>Logout</button>
-          <button onClick={() => navigate("/add")}>Add Product</button>
+        <nav className="p-4 bg-gray-800 text-white flex justify-between items-center">
+          <h1 className="text-lg font-bold">
+            Logged in user: {localStorage.getItem("username")}
+          </h1>
+          <div>
+            <button
+              onClick={() => navigate("/products")}
+              className="px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-600 mr-2"
+            >
+              Products
+            </button>
+            <button
+              onClick={() => navigate("/transactions")}
+              className="px-4 py-2 bg-green-500 rounded-md hover:bg-green-600 mr-2"
+            >
+              Transactions
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-500 rounded-md hover:bg-red-600 mr-2"
+            >
+              Logout
+            </button>
+            <button
+              onClick={() => navigate("/add")}
+              className="px-4 py-2 bg-yellow-500 rounded-md hover:bg-yellow-600"
+            >
+              Add Product
+            </button>
+          </div>
         </nav>
       )}
       <Routes>

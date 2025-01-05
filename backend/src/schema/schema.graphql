@@ -35,9 +35,14 @@ type Transaction {
   createdAt: String!
 }
 
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
 type Mutation {
   registerUser(email: String!, password: String!, name: String!): User
-  loginUser(email: String!, password: String!): String
+  loginUser(email: String!, password: String!): AuthPayload!
   addProduct(
     name: String!
     description: String!
@@ -54,7 +59,7 @@ type Mutation {
     status: String
   ): Product
   deleteProduct(id: Int!): String
-  buyProduct(productId: Int!): Transaction
+  buyProduct(productId: Int!): [Transaction!]
   rentProduct(productId: Int!): Transaction
 }
 

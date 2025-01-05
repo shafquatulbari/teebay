@@ -230,37 +230,38 @@ const productResolvers = {
         throw new Error("Product is not available for purchase.");
       }
 
-      // Create two transactions: BUY for buyer and SELL for seller
-      const transactions = await prisma.transaction.createMany({
-        data: [
-          {
-            productId,
-            userId, // The user who is buying
-            type: "BUY",
-          },
-          {
-            productId,
-            userId: product.ownerId, // The product owner
-            type: "SELL",
-          },
-        ],
+      // Create the "BUY" transaction for the buyer
+      const buyTransaction = await prisma.transaction.create({
+        data: {
+          productId,
+          userId, // The user buying the product
+          type: "BUY",
+        },
+        include: {
+          product: { include: { owner: true } }, // Include product details
+        },
       });
 
-      // Update the product's status
+      // Create the "SELL" transaction for the seller
+      const sellTransaction = await prisma.transaction.create({
+        data: {
+          productId,
+          userId: product.ownerId, // The product owner
+          type: "SELL",
+        },
+        include: {
+          product: { include: { owner: true } }, // Include product details
+        },
+      });
+
+      // Update the product's status to "SOLD"
       await prisma.product.update({
         where: { id: productId },
         data: { status: "SOLD" },
       });
 
-      // Fetch and return created transactions
-      const createdTransactions = await prisma.transaction.findMany({
-        where: { productId },
-        include: {
-          product: { include: { owner: true } },
-        },
-      });
-
-      return createdTransactions;
+      // Return the "BUY" transaction (or both if needed)
+      return buyTransaction; // Return only the buy transaction, as required
     },
   },
 };

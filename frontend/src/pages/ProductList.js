@@ -106,58 +106,89 @@ const ProductList = () => {
     }
   };
 
-  if (error) return <p>Error: {error.message}</p>;
-  if (loading) return <p>Loading products...</p>;
+  if (error) return <p className="text-red-500">Error: {error.message}</p>;
+  if (loading) return <p className="text-gray-500">Loading products...</p>;
 
   return (
-    <div>
-      <h2>My Products</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Rental Rate</th>
-            <th>Category</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.getProducts.map((product) => (
-            <tr key={product.id}>
-              <td>{product.name}</td>
-              <td>{product.description}</td>
-              <td>${product.price.toFixed(2)}</td>
-              <td>${product.rentalRate?.toFixed(2)}</td>
-              <td>{product.category?.name || "N/A"}</td>
-              <td>{product.status}</td>
-              <td>
-                {product.owner?.id === currentUserId ? (
-                  <>
-                    <button
-                      onClick={() =>
-                        navigate(`/edit/${product.id}`, { state: { product } })
-                      }
-                    >
-                      Edit
-                    </button>
-                    <button onClick={() => handleDelete(product.id)}>
-                      Delete
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={() => handleRent(product.id)}>Rent</button>
-                    <button onClick={() => handleBuy(product.id)}>Buy</button>
-                  </>
-                )}
-              </td>
+    <div className="p-4 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-6 text-center">My Products</h2>
+      <div className="overflow-x-auto">
+        <table className="table-auto w-full border-collapse bg-white shadow-md rounded-lg">
+          <thead>
+            <tr className="bg-blue-500 text-white">
+              <th className="px-4 py-2">Name</th>
+              <th className="px-4 py-2">Description</th>
+              <th className="px-4 py-2">Price</th>
+              <th className="px-4 py-2">Rental Rate</th>
+              <th className="px-4 py-2">Category</th>
+              <th className="px-4 py-2">Status</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.getProducts.map((product) => (
+              <tr
+                key={product.id}
+                className="border-t hover:bg-gray-100 transition-colors"
+              >
+                <td className="px-4 py-2 text-center">{product.name}</td>
+                <td className="px-4 py-2 text-center">{product.description}</td>
+                <td className="px-4 py-2 text-center">
+                  ${product.price.toFixed(2)}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  ${product.rentalRate?.toFixed(2) || "N/A"}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  {product.category?.name || "N/A"}
+                </td>
+                <td className="px-4 py-2 text-center">{product.status}</td>
+                <td className="px-4 py-2 text-center">
+                  {product.owner?.id === currentUserId ? (
+                    <>
+                      <button
+                        onClick={() =>
+                          navigate(`/edit/${product.id}`, {
+                            state: { product },
+                          })
+                        }
+                        className="px-4 py-2 bg-yellow-500 text-white rounded-md mr-2 hover:bg-yellow-600"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {product.status === "AVAILABLE" && (
+                        <>
+                          <button
+                            onClick={() => handleRent(product.id)}
+                            className="px-4 py-2 bg-green-500 text-white rounded-md mr-2 hover:bg-green-600"
+                          >
+                            Rent
+                          </button>
+                          <button
+                            onClick={() => handleBuy(product.id)}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                          >
+                            Buy
+                          </button>
+                        </>
+                      )}
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

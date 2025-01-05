@@ -21,14 +21,11 @@ const GET_USER_TRANSACTIONS = gql`
 
 const TransactionDashboard = () => {
   const { loading, error, data } = useQuery(GET_USER_TRANSACTIONS);
-  console.log("Transaction Data:", data);
-
   const currentUserId = Number(localStorage.getItem("userId"));
 
-  if (loading) return <p>Loading transactions...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (loading) return <p className="text-gray-500">Loading transactions...</p>;
+  if (error) return <p className="text-red-500">Error: {error.message}</p>;
 
-  // Filter transactions based on type and user involvement
   const purchases =
     data?.getUserTransactions?.filter(
       (transaction) =>
@@ -58,92 +55,112 @@ const TransactionDashboard = () => {
     ) || [];
 
   return (
-    <div>
-      <h2>My Transactions</h2>
+    <div className="p-4 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-6 text-center">My Transactions</h2>
 
-      <h3>Purchased Products</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Product Name</th>
-            <th>Price</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {purchases.map((transaction) => (
-            <tr key={transaction.id}>
-              <td>{transaction.product.name}</td>
-              <td>${transaction.product.price.toFixed(2)}</td>
-              <td>
-                {new Date(Number(transaction.createdAt)).toLocaleDateString()}
-              </td>
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold mb-4">Purchased Products</h3>
+        <table className="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-blue-500 text-white">
+              <th className="px-4 py-2">Product Name</th>
+              <th className="px-4 py-2">Price</th>
+              <th className="px-4 py-2">Date</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {purchases.map((transaction) => (
+              <tr key={transaction.id} className="border-t hover:bg-gray-100">
+                <td className="px-4 py-2 text-center">
+                  {transaction.product.name}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  ${transaction.product.price.toFixed(2)}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  {new Date(Number(transaction.createdAt)).toLocaleDateString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <h3>Sold Products</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Product Name</th>
-            <th>Price</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sales.map((transaction) => (
-            <tr key={transaction.id}>
-              <td>{transaction.product.name}</td>
-              <td>${transaction.product.price.toFixed(2)}</td>
-              <td>
-                {new Date(Number(transaction.createdAt)).toLocaleDateString()}
-              </td>
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold mb-4">Sold Products</h3>
+        <table className="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-green-500 text-white">
+              <th className="px-4 py-2">Product Name</th>
+              <th className="px-4 py-2">Price</th>
+              <th className="px-4 py-2">Date</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sales.map((transaction) => (
+              <tr key={transaction.id} className="border-t hover:bg-gray-100">
+                <td className="px-4 py-2 text-center">
+                  {transaction.product.name}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  ${transaction.product.price.toFixed(2)}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  {new Date(Number(transaction.createdAt)).toLocaleDateString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <h3>Borrowed Products</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Product Name</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {borrowed.map((transaction) => (
-            <tr key={transaction.id}>
-              <td>{transaction.product.name}</td>
-              <td>
-                {new Date(Number(transaction.createdAt)).toLocaleDateString()}
-              </td>
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold mb-4">Borrowed Products</h3>
+        <table className="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-yellow-500 text-white">
+              <th className="px-4 py-2">Product Name</th>
+              <th className="px-4 py-2">Date</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {borrowed.map((transaction) => (
+              <tr key={transaction.id} className="border-t hover:bg-gray-100">
+                <td className="px-4 py-2 text-center">
+                  {transaction.product.name}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  {new Date(Number(transaction.createdAt)).toLocaleDateString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <h3>Lent Products</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Product Name</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {lent.map((transaction) => (
-            <tr key={transaction.id}>
-              <td>{transaction.product.name}</td>
-              <td>
-                {new Date(Number(transaction.createdAt)).toLocaleDateString()}
-              </td>
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold mb-4">Lent Products</h3>
+        <table className="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-red-500 text-white">
+              <th className="px-4 py-2">Product Name</th>
+              <th className="px-4 py-2">Date</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {lent.map((transaction) => (
+              <tr key={transaction.id} className="border-t hover:bg-gray-100">
+                <td className="px-4 py-2 text-center">
+                  {transaction.product.name}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  {new Date(Number(transaction.createdAt)).toLocaleDateString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
