@@ -47,14 +47,22 @@ const userResolvers = {
 
       // Generate JWT token
       const token = jwt.sign(
-        { userId: user.id, email: user.email },
+        { userId: user.id, email: user.email, name: user.name }, // Include username in the token payload
         SECRET_KEY,
         {
           expiresIn: "1h",
         }
       );
 
-      return token;
+      // Return the token and user information
+      return {
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+      };
     },
   },
 };

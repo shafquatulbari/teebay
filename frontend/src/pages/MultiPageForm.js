@@ -193,89 +193,142 @@ const MultiPageForm = ({ isEditing, productId }) => {
   };
 
   return (
-    <div>
-      <h2>{isEditing ? "Edit Product" : "Add Product"}</h2>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {step === 1 && (
-          <>
-            <label>Name</label>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <input {...field} placeholder="Product Name" required />
-              )}
-            />
-            <label>Description</label>
-            <Controller
-              name="description"
-              control={control}
-              render={({ field }) => (
-                <textarea
-                  {...field}
-                  placeholder="Product Description"
-                  required
-                />
-              )}
-            />
-          </>
-        )}
-        {step === 2 && (
-          <>
-            <label>Price</label>
-            <Controller
-              name="price"
-              control={control}
-              render={({ field }) => (
-                <input {...field} type="number" placeholder="Price" required />
-              )}
-            />
-            <label>Rental Rate</label>
-            <Controller
-              name="rentalRate"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="number"
-                  placeholder="Rental Rate"
-                  required={!isEditing}
-                />
-              )}
-            />
-            <label>Category</label>
-            {loading && <p>Loading categories...</p>}
-            {error && <p>Error loading categories: {error.message}</p>}
-            <Controller
-              name="categoryId"
-              control={control}
-              render={({ field }) => (
-                <select {...field} required disabled={loading || error}>
-                  <option value="">Select a Category</option>
-                  {data?.getCategories?.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            />
-          </>
-        )}
-        <div>
-          {step > 1 && (
-            <button type="button" onClick={() => setStep((s) => s - 1)}>
-              Back
-            </button>
+    <div className="p-6 bg-gray-100 min-h-screen flex justify-center items-center">
+      <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          {isEditing ? "Edit Product" : "Add Product"}
+        </h2>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {step === 1 && (
+            <div className="mb-6">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Name
+              </label>
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    placeholder="Product Name"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                )}
+              />
+              <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <textarea
+                    {...field}
+                    placeholder="Product Description"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                )}
+              />
+            </div>
           )}
-          {step < 2 && (
-            <button type="button" onClick={() => setStep((s) => s + 1)}>
-              Next
-            </button>
+          {step === 2 && (
+            <div className="mb-6">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Price
+              </label>
+              <Controller
+                name="price"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="number"
+                    placeholder="Price"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                )}
+              />
+              <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">
+                Rental Rate
+              </label>
+              <Controller
+                name="rentalRate"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="number"
+                    placeholder="Rental Rate"
+                    required={!isEditing}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                )}
+              />
+              <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">
+                Category
+              </label>
+              {loading && (
+                <p className="text-sm text-gray-500">Loading categories...</p>
+              )}
+              {error && (
+                <p className="text-sm text-red-500">
+                  Error loading categories: {error.message}
+                </p>
+              )}
+              <Controller
+                name="categoryId"
+                control={control}
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    required
+                    disabled={loading || error}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select a Category</option>
+                    {data?.getCategories?.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              />
+            </div>
           )}
-          {step === 2 && <button type="submit">Submit</button>}
-        </div>
-      </form>
+          <div className="flex justify-between mt-4">
+            {step > 1 && (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s - 1)}
+                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              >
+                Back
+              </button>
+            )}
+            {step < 2 && (
+              <button
+                type="button"
+                onClick={() => setStep((s) => s + 1)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              >
+                Next
+              </button>
+            )}
+            {step === 2 && (
+              <button
+                type="submit"
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+              >
+                Submit
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
