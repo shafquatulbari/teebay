@@ -14,7 +14,8 @@ type Product {
   name: String!
   description: String!
   price: Float!
-  category: Category!
+  rentalRate: Float
+  category: Category
   owner: User!
   status: String!
   createdAt: String!
@@ -41,6 +42,7 @@ type Mutation {
     name: String!
     description: String!
     price: Float!
+    rentalRate: Float
     categoryId: Int!
   ): Product
   editProduct(
@@ -48,14 +50,19 @@ type Mutation {
     name: String
     description: String
     price: Float
+    rentalRate: Float
     status: String
   ): Product
   deleteProduct(id: Int!): String
+  buyProduct(productId: Int!): Transaction
+  rentProduct(productId: Int!): Transaction
 }
 
 extend type Query {
-  getProducts: [Product]
+  getProducts: [Product!]!
   getProductById(id: Int!): Product
   getUserTransactions: [Transaction]
   getCategories: [Category!]!
+  getUserTransactions: [Transaction]!
+  getUserId: Int! # Ensure this returns the logged-in user's ID
 }

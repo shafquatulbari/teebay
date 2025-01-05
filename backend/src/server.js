@@ -24,10 +24,9 @@ const parseToken = (token) => {
     if (!token) {
       return null;
     }
-    // Remove "Bearer " prefix if present
     const cleanedToken = token.startsWith("Bearer ") ? token.slice(7) : token;
     const decoded = jwt.verify(cleanedToken, SECRET_KEY);
-    return decoded.userId; // Extract and return only userId
+    return decoded.userId;
   } catch (error) {
     console.error("Invalid token:", error.message);
     return null;
@@ -49,9 +48,7 @@ const server = new ApolloServer({
   context: ({ req }) => {
     const token = req.headers.authorization || "";
     const userId = parseToken(token);
-    // if (!userId) {
-    //   throw new Error("Unauthorized: Invalid or missing token");
-    // }
+    console.log("Context userId:", userId);
     return { userId };
   },
 });

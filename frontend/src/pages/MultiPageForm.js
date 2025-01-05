@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import { useQuery } from "@apollo/client";
+import { useLocation } from "react-router-dom";
 
 export const GET_CATEGORIES = gql`
   query GetCategories {
@@ -18,18 +19,21 @@ export const ADD_PRODUCT = gql`
     $name: String!
     $description: String!
     $price: Float!
+    $rentalRate: Float
     $categoryId: Int!
   ) {
     addProduct(
       name: $name
       description: $description
       price: $price
+      rentalRate: $rentalRate
       categoryId: $categoryId
     ) {
       id
       name
       description
       price
+      rentalRate
       category {
         id
         name
@@ -38,12 +42,14 @@ export const ADD_PRODUCT = gql`
     }
   }
 `;
+
 export const EDIT_PRODUCT = gql`
   mutation EditProduct(
     $id: Int!
     $name: String
     $description: String
     $price: Float
+    $rentalRate: Float
     $status: String
   ) {
     editProduct(
@@ -51,12 +57,14 @@ export const EDIT_PRODUCT = gql`
       name: $name
       description: $description
       price: $price
+      rentalRate: $rentalRate
       status: $status
     ) {
       id
       name
       description
       price
+      rentalRate
       status
       category {
         id
@@ -66,14 +74,19 @@ export const EDIT_PRODUCT = gql`
   }
 `;
 
-const MultiPageForm = ({ isEditing, productId, preloadedData }) => {
+const MultiPageForm = ({ isEditing, productId }) => {
   const [step, setStep] = useState(1);
-  const { control, handleSubmit } = useForm({
-    defaultValues: preloadedData || {
-      name: "",
-      description: "",
-      price: "",
-      categoryId: "",
+  const { state } = useLocation();
+
+  const { control, handleSubmit, setValue } = useForm({
+    defaultValues: {
+      id: state?.product?.id || "",
+      name: state?.product?.name || "",
+      description: state?.product?.description || "",
+      price: state?.product?.price || "",
+      rentalRate: state?.product?.rentalRate || "",
+      categoryId: state?.product?.category?.id || "",
+      status: state?.product?.status || "",
     },
   });
 
@@ -95,6 +108,7 @@ const MultiPageForm = ({ isEditing, productId, preloadedData }) => {
                     id
                     name
                   }
+                  rentalRate
                   status
                 }
               `,
@@ -106,26 +120,74 @@ const MultiPageForm = ({ isEditing, productId, preloadedData }) => {
     },
   });
 
-  const [editProduct] = useMutation(EDIT_PRODUCT);
+  const [editProduct] = useMutation(EDIT_PRODUCT, {
+    update(cache, { data: { editProduct } }) {
+      cache.modify({
+        fields: {
+          getProducts(existingProducts = []) {
+            const updatedProductRef = cache.writeFragment({
+              data: editProduct,
+              fragment: gql`
+                fragment UpdatedProduct on Product {
+                  id
+                  name
+                  description
+                  price
+                  category {
+                    id
+                    name
+                  }
+                  rentalRate
+                  status
+                }
+              `,
+            });
+            return existingProducts.map((product) =>
+              product.id === editProduct.id ? updatedProductRef : product
+            );
+          },
+        },
+      });
+    },
+  });
+
+  React.useEffect(() => {
+    if (isEditing && state?.product) {
+      const { product } = state;
+      Object.keys(product).forEach((key) => {
+        setValue(key, product[key]);
+      });
+    }
+  }, [isEditing, state, setValue]);
 
   const onSubmit = async (data) => {
+    const variables = {
+      id: productId || state?.product?.id,
+      name: data.name,
+      description: data.description,
+      price: parseFloat(data.price),
+      rentalRate: data.rentalRate ? parseFloat(data.rentalRate) : null,
+      status: data.status || null,
+    };
+
+    console.log("Variables for editProduct:", variables);
+
     try {
       if (isEditing) {
-        await editProduct({
-          variables: { id: productId, ...data },
-        });
+        await editProduct({ variables });
         alert("Product updated successfully!");
       } else {
         await addProduct({
           variables: {
-            ...data,
-            price: parseFloat(data.price), // Ensure price is a Float
-            categoryId: parseInt(data.categoryId), // Ensure categoryId is an Int
+            ...variables,
+            categoryId: parseInt(data.categoryId),
           },
         });
         alert("Product added successfully!");
       }
     } catch (err) {
+      console.error("variables", variables);
+      console.error("GraphQL Error:", err);
       alert(`Error: ${err.message}`);
     }
   };
@@ -166,6 +228,19 @@ const MultiPageForm = ({ isEditing, productId, preloadedData }) => {
               control={control}
               render={({ field }) => (
                 <input {...field} type="number" placeholder="Price" required />
+              )}
+            />
+            <label>Rental Rate</label>
+            <Controller
+              name="rentalRate"
+              control={control}
+              render={({ field }) => (
+                <input
+                  {...field}
+                  type="number"
+                  placeholder="Rental Rate"
+                  required={!isEditing}
+                />
               )}
             />
             <label>Category</label>
