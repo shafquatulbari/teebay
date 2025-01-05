@@ -165,18 +165,22 @@ const ProductList = () => {
                     </>
                   ) : (
                     <>
-                      <button
-                        onClick={() => handleRent(product.id)}
-                        className="px-4 py-2 bg-green-500 text-white rounded-md mr-2 hover:bg-green-600"
-                      >
-                        Rent
-                      </button>
-                      <button
-                        onClick={() => handleBuy(product.id)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                      >
-                        Buy
-                      </button>
+                      {product.status === "AVAILABLE" && (
+                        <>
+                          <button
+                            onClick={() => handleRent(product.id)}
+                            className="px-4 py-2 bg-green-500 text-white rounded-md mr-2 hover:bg-green-600"
+                          >
+                            Rent
+                          </button>
+                          <button
+                            onClick={() => handleBuy(product.id)}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                          >
+                            Buy
+                          </button>
+                        </>
+                      )}
                     </>
                   )}
                 </td>

@@ -59,7 +59,7 @@ type Mutation {
     status: String
   ): Product
   deleteProduct(id: Int!): String
-  buyProduct(productId: Int!): Transaction
+  buyProduct(productId: Int!): [Transaction!]
   rentProduct(productId: Int!): Transaction
 }
 
