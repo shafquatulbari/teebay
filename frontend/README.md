@@ -1,70 +1,97 @@
-# Getting Started with Create React App
+# Project: Teebay
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Summary
+Teebay is an e-commerce platform designed to facilitate product listings, rentals, and sales. The project is built with a modern tech stack comprising React, Apollo Client, Prisma, PostgreSQL, and Tailwind CSS. It features user authentication, product management, transaction handling, and a styled user interface.
 
-## Available Scripts
+### Key Features
+- **User Authentication:** Secure registration and login using JWT and bcrypt.
+- **Product Management:** Add, edit, delete, rent, and buy products.
+- **Category Management:** Define product categories using Prisma Studio.
+- **Transactions:** Handle product rentals and purchases with detailed records.
+- **Responsive UI:** Styled with Tailwind CSS for a seamless user experience.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Setup and Run Instructions
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Prerequisites
+Ensure you have the following installed on your system:
+- Node.js (v16 or above)
+- PostgreSQL (configured and running)
+- npm or yarn
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Backend Setup
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Configure the `.env` file with your database connection string:
+   ```env
+   DATABASE_URL="postgresql://<username>:<password>@localhost:5432/<database_name>"
+   ```
+4. Initialize Prisma and apply migrations:
+   ```bash
+   npx prisma migrate dev
+   ```
+5. Start the backend server:
+   ```bash
+   npm start
+   ```
 
-### `npm test`
+### Adding Categories with Prisma Studio
+To add product categories:
+1. Run Prisma Studio:
+   ```bash
+   npx prisma studio
+   ```
+2. Navigate to the `Category` model and add entries directly.
+3. Save changes to reflect them in your database.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Frontend Setup
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm start
+   ```
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Scripts
+| Script           | Description                                    |
+|-------------------|------------------------------------------------|
+| `npm start`      | Runs the development server for frontend.     |
+| `npm run build`  | Builds the frontend for production.           |
+| `npm run test`   | Runs tests for the frontend.                  |
+| `npm start` (backend) | Starts the backend server.               |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Dependencies
+### Frontend
+- React
+- Apollo Client
+- Tailwind CSS
+- React Router DOM
+- react-hook-form
 
-### `npm run eject`
+### Backend
+- Apollo Server
+- Prisma
+- PostgreSQL
+- bcrypt
+- jsonwebtoken
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Teebay is designed for scalability and ease of use. Feel free to contribute or report issues to enhance the platform!
